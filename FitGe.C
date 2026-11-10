@@ -11,32 +11,55 @@ void FitGe(){
 
 //valori della corrente
 
-Float_t x[10] = {};
-Float_t y[10] = {};
-Float_t ex[10] = {};
-Float_t ey[10] = {};
+Float_t x[15] = {50,60,70,80,90,100,110,120,130,140,150,200,250,300,400};
+Float_t y[15] = { 0.002,0.004, 0.006, 0.009, 0.013, 0.017,0.024,0.031,0.039,0.05,0.064,0.169,0.334,0.575,1.142};
+Float_t ey[15] = {0.00001,0.00004,0.00004,0.00006,0.00007,0.00009,0.0003,0.0003,0.0004,0.0004,0.0005,0.001,0.003,0.004,0.007};
+Float_t ex[15] = {7,7,7,7,8,8,8,8,8,8,8,9,10,11,19};
 
-TCanvas *c1 = new TCanvas("c1", "Fit Diodo", 800, 600);
-c1->SetLogy();
-c1->SetGrid();
 
 //crate graph
-TGraphErrors *gr = new TGraphErrors(10, x, y, ex, ey);
-gr->SetTitle("DIodo al Ge");
-
-//draw
+TGraphErrors *gr = new TGraphErrors(15, x, y, ex, ey);
+gr->SetTitle("Diodo al Ge");
 gr->SetMarkerStyle(4);
 gr->Draw("AP");
-gr->GetXaxis()->SetTitle("Voltage (eV)");
+gr->GetXaxis()->SetTitle("Voltage (mV)");
 gr->GetYaxis()->SetTitle("Current(mA)");
 
 //define user fit function and fit
-TF1 *f1 = new TF1("f1", "[0]*(exp(x/[1])-1)", 400, 800);
+TF1 *f1 = new TF1("f1", "[0]*(exp(x/[1])-1)", 40, 130);
+f1->SetParNames("I_0", "eta*V_T");
 
-f1->SetParameter(0, 3e-6);
-f1->SetParameter(1, 50.);
-f1->SetParName(0, "I0");
-f1->SetParName(1, "Eta*V_T");
+
+f1->SetParameter(0, 1e-3);
+f1->SetParameter(1, 29);
 gStyle->SetOptFit(1111);
-gr->Fit("f1", "R");
+
+gr->Fit(f1, "R");
+
+
+
+double A  = f1->GetParameter(0);
+double dA = f1->GetParError(0);
+double B  = f1->GetParameter(1);
+ double dB = f1->GetParError(1);
+double chi2 = f1->GetChisquare();
+ int ndf     = f1->GetNDF();
+
+std::cout << "\n--- RISULTATI DEL FIT IN TERMINALE ---" << std::endl;
+   std::cout << "I_0 : " << A << " +/- " << dA << " V" << std::endl;
+   std::cout << "eta*V_T   : " << B << " +/- " << dB << std::endl;
+  std::cout << "Chi2 / ndf    : " << chi2 << " / " << ndf << std::endl;
+std::cout << "--------------------------------------\n" << std::endl;
+
+
+TCanvas *c1 = new TCanvas("c1", "Fit Diodo", 800, 600);
+
+    gr->Draw("AP");
+   f1->SetLineColor(kBlue);
+   f1->SetLineWidth(2);
+   f1->Draw("SAME");
+     c1->SaveAs("fitGe.png");
+//c1->SetLogy();
+c1->SetGrid();
+
 }
