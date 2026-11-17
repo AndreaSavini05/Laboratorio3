@@ -1,4 +1,3 @@
-
 #include "TCanvas.h"
 #include "TGraphErrors.h"
 #include "TF1.h"
@@ -13,8 +12,8 @@ void FitGe(){
 
 Float_t x[15] = {50,60,70,80,90,100,110,120,130,140,150,200,250,300,400};
 Float_t y[15] = { 0.002,0.004, 0.006, 0.009, 0.013, 0.017,0.024,0.031,0.039,0.05,0.064,0.169,0.334,0.575,1.142};
-Float_t ey[15] = {0.00001,0.00004,0.00004,0.00006,0.00007,0.00009,0.0003,0.0003,0.0004,0.0004,0.0005,0.001,0.003,0.004,0.007};
-Float_t ex[15] = {7,7,7,7,8,8,8,8,8,8,8,9,10,11,19};
+Float_t ey[15] = {0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.002,0.003,0.003,0.004,0.007};
+Float_t ex[15] = {7,7,7,7,8,8,8,8,8,8,8,9,10,10,20};
 
 
 //crate graph
@@ -26,8 +25,9 @@ gr->GetXaxis()->SetTitle("Voltage (mV)");
 gr->GetYaxis()->SetTitle("Current(mA)");
 
 //define user fit function and fit
-TF1 *f1 = new TF1("f1", "[0]*(exp(x/[1])-1)", 40, 130);
-f1->SetParNames("I_0", "eta*V_T");
+TF1 *f1 = new TF1("f1", "1e-3* [0]*(exp(x/[1])-1)", 48, 120);
+//TF1 *f1 = new TF1("f1", "[0]*(-log([1]) + log(x))", 0, 0.098);
+f1->SetParNames("I_0 [e-3]","eta*V_T");
 
 
 f1->SetParameter(0, 1e-3);
@@ -59,7 +59,7 @@ TCanvas *c1 = new TCanvas("c1", "Fit Diodo", 800, 600);
    f1->SetLineWidth(2);
    f1->Draw("SAME");
      c1->SaveAs("fitGe.png");
-//c1->SetLogy();
+c1->SetLogy();
 c1->SetGrid();
 
 }
